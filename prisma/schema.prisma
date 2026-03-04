@@ -7,6 +7,61 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Boleto {
+  id               String        @id @default(cuid())
+  clienteNome      String
+  pagadorNome      String?
+  seuNumero        String?
+  nossoNumero      String?
+  valorCentavos    Int
+  dataVencimento   DateTime
+  status           StatusBoleto  @default(ABERTO)
+  pagadorDocumento String?
+  pagadorEmail     String?
+  pagadorTelefone  String?
+  pagadorEndereco  String?
+  pagadorCidade    String?
+  pagadorUF        String?
+  pagadorCEP       String?
+  linhaDigitavel   String?
+  codigoBarras     String?
+  pdfUrl           String?
+  criadoEm         DateTime      @default(now())
+  dataEmissao      DateTime      @default(now())
+  atualizadoEm     DateTime      @updatedAt
+  notificacoes     Notificacao[]
+}
+
+model Notificacao {
+  id        String          @id @default(cuid())
+  boletoId  String
+  tipo      NotificacaoTipo
+  enviadoEm DateTime        @default(now())
+  destino   String
+  boleto    Boleto          @relation(fields: [boletoId], references: [id], onDelete: Cascade)
+
+  @@index([boletoId])
+}
+
+model Config {
+  id              Int      @id @default(1)
+  telefoneDono    String
+  horaEnvioResumo String   @default("08:00")
+  criadoEm        DateTime @default(now())
+  atualizadoEm    DateTime @updatedAt
+}
+
+model User {
+  id           String   @id @default(cuid())
+  nome         String   @unique
+  email        String?  @unique
+  passwordHash String
+  role         Role
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+  dataEmissao  DateTime @default(now())
+}
+
 enum StatusBoleto {
   ABERTO
   PAGO
@@ -22,80 +77,8 @@ enum NotificacaoTipo {
   CANCELADO
 }
 
-model Boleto {
-  id               String       @id @default(cuid())
-
-  // Campo antigo (mantemos por enquanto para NÃO perder dados)
-  clienteNome      String
-
-  // Novo campo (vai virar obrigatório depois que migrarmos os dados)
-  pagadorNome      String?
-
-  // Identificadores (para integração Sicoob)
-  seuNumero        String?
-  nossoNumero      String?
-
-  // Dados financeiros
-  valorCentavos    Int
-  dataVencimento   DateTime
-  status           StatusBoleto @default(ABERTO)
-
-  // Dados do pagador
-  pagadorDocumento String?      // CPF/CNPJ
-  pagadorEmail     String?
-  pagadorTelefone  String?
-
-  pagadorEndereco  String?
-  pagadorCidade    String?
-  pagadorUF        String?
-  pagadorCEP       String?
-
-  // Dados do boleto (retornados pelo banco)
-  linhaDigitavel   String?
-  codigoBarras     String?
-  pdfUrl           String?
-
-  // Controle
-  criadoEm         DateTime     @default(now())
-  dataEmissao      DateTime     @default(now())
-  atualizadoEm     DateTime     @updatedAt
-
-  notificacoes     Notificacao[]
-}
-
-model Notificacao {
-  id         String           @id @default(cuid())
-  boletoId   String
-  tipo       NotificacaoTipo
-  enviadoEm  DateTime         @default(now())
-  destino    String
-
-  boleto     Boleto           @relation(fields: [boletoId], references: [id], onDelete: Cascade)
-
-  @@index([boletoId])
-}
-
-model Config {
-  id              Int      @id @default(1)
-  telefoneDono    String
-  horaEnvioResumo String   @default("08:00")
-
-  criadoEm        DateTime @default(now())
-  atualizadoEm    DateTime @updatedAt
-}
 enum Role {
   ADMIN
   DONO
   OPERADOR
-}
-
-model User {
-  id           String   @id @default(cuid())
-  nome         String   @unique
-  email        String?  @unique
-  passwordHash String
-  role         Role
-  criadoEm     DateTime @default(now())
-  atualizadoEm DateTime @updatedAt
-  dataEmissao DateTime @default(now())
 }

@@ -2,6 +2,7 @@ import NovoBoletoForm from "../NovoBoletoForm";
 import DashboardResumo from "../DashboardResumo";
 import LogoutButton from "../LogoutButton";
 import Link from "next/link";
+import { prisma } from "@/app/lib/prisma";
 
 type Status = "ABERTO" | "PAGO" | "CANCELADO";
 
@@ -12,16 +13,29 @@ type BoletoDTO = {
   dataVencimento: string;
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function Page() {
-  const res = await fetch("http://localhost:3000/api/boletos", {
-    cache: "no-store",
+  const boletosDB = await prisma.boleto.findMany({
+    select: {
+      id: true,
+      valorCentavos: true,
+      status: true,
+      dataVencimento: true,
+    },
+    orderBy: { criadoEm: "desc" },
   });
 
-  const boletos: BoletoDTO[] = await res.json();
+  const boletos: BoletoDTO[] = boletosDB.map((b) => ({
+    id: b.id,
+    valorCentavos: b.valorCentavos,
+    status: b.status as Status,
+    dataVencimento:
+      (b.dataVencimento as any)?.toISOString?.() ?? String(b.dataVencimento),
+  }));
 
   return (
     <main style={{ padding: 24 }}>
-      
       {/* Topo */}
       <div
         style={{
@@ -33,11 +47,9 @@ export default async function Page() {
           marginBottom: 10,
         }}
       >
-        {/* vazio para manter alinhamento */}
         <div />
 
         <div style={{ display: "flex", gap: 10 }}>
-          
           <Link href="/boletos">
             <button
               style={{
