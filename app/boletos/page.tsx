@@ -1,6 +1,7 @@
 import Link from "next/link";
 import BoletosTable from "./BoletosTable";
 import LogoutButton from "./LogoutButton";
+import { prisma } from "@/app/lib/prisma";
 
 type Status = "ABERTO" | "PAGO" | "CANCELADO";
 
@@ -9,32 +10,24 @@ export type BoletoDTO = {
   clienteNome?: string | null;
   pagadorNome?: string | null;
   valorCentavos: number;
-  dataVencimento: string; // ISO string
-  criadoEm?: string; // ISO string
-  atualizadoEm?: string; // ISO string
+  dataVencimento: string; // ISO
+  criadoEm?: string; // ISO
+  atualizadoEm?: string; // ISO
   status: Status;
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function Page() {
-  const res = await fetch("http://localhost:3000/api/boletos", {
-    cache: "no-store",
+  const boletosDB = await prisma.boleto.findMany({
+    orderBy: { criadoEm: "desc" },
   });
 
-  const boletosRaw = await res.json();
-
-  // ✅ normaliza datas (caso alguma venha como Date/qualquer coisa)
-  const boletos: BoletoDTO[] = (boletosRaw ?? []).map((b: any) => ({
+  const boletos: BoletoDTO[] = boletosDB.map((b: any) => ({
     ...b,
-    dataVencimento:
-      b.dataVencimento instanceof Date
-        ? b.dataVencimento.toISOString()
-        : String(b.dataVencimento),
-    criadoEm:
-      b.criadoEm instanceof Date ? b.criadoEm.toISOString() : b.criadoEm,
-    atualizadoEm:
-      b.atualizadoEm instanceof Date
-        ? b.atualizadoEm.toISOString()
-        : b.atualizadoEm,
+    dataVencimento: b.dataVencimento?.toISOString?.() ?? String(b.dataVencimento),
+    criadoEm: b.criadoEm?.toISOString?.() ?? b.criadoEm,
+    atualizadoEm: b.atualizadoEm?.toISOString?.() ?? b.atualizadoEm,
   }));
 
   return (
@@ -50,7 +43,6 @@ export default async function Page() {
           marginBottom: 10,
         }}
       >
-        {/* VOLTAR -> /boletos/novo */}
         <Link href="/boletos/novo">
           <button
             style={{
@@ -68,7 +60,6 @@ export default async function Page() {
         </Link>
 
         <div style={{ display: "flex", gap: 10 }}>
-          {/* RELATÓRIO MENSAL -> /relatorios/mensal */}
           <Link href="/relatorios/mensal">
             <button
               style={{
@@ -85,7 +76,6 @@ export default async function Page() {
             </button>
           </Link>
 
-          {/* SAIR */}
           <LogoutButton />
         </div>
       </div>
