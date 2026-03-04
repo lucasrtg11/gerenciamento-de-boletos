@@ -14,25 +14,50 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Dados inválidos" }, { status: 400 });
     }
 
-    // ✅ SQLite: sem mode/insensitive.
-    // Como nome é @unique, use findUnique.
-    const user = await prisma.user.findUnique({
-      where: { nome },
-    });
+    // 1) tenta login pelo banco
+    const user = await prisma.user.findUnique({ where: { nome } });
 
+    // 2) se não existe no banco, tenta ADMIN via env
     if (!user) {
-      return NextResponse.json({ error: "Usuário ou senha inválidos" }, { status: 401 });
+      const envUser = (process.env.ADMIN_USER || "").trim().toLowerCase();
+      const envPass = process.env.ADMIN_PASS || "";
+
+      if (envUser && envPass && nome === envUser && senha === envPass) {
+        const token = createSessionToken({ email: envUser, role: "ADMIN" });
+
+        const res = NextResponse.json({ ok: true, via: "env" });
+        res.cookies.set(AUTH_COOKIE_NAME, token, {
+          httpOnly: true,
+          sameSite: "lax",
+          secure: process.env.NODE_ENV === "production",
+          path: "/",
+          maxAge: 60 * 60 * 8,
+        });
+
+        return res;
+      }
+
+      return NextResponse.json(
+        { error: "Usuário ou senha inválidos" },
+        { status: 401 }
+      );
     }
 
+    // 3) se existe no banco, valida hash
     const ok = await bcrypt.compare(senha, user.passwordHash);
     if (!ok) {
-      return NextResponse.json({ error: "Usuário ou senha inválidos" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Usuário ou senha inválidos" },
+        { status: 401 }
+      );
     }
 
-    const token = createSessionToken({ email: user.email ?? user.nome, role: user.role });
+    const token = createSessionToken({
+      email: user.email ?? user.nome,
+      role: user.role,
+    });
 
-    const res = NextResponse.json({ ok: true });
-
+    const res = NextResponse.json({ ok: true, via: "db" });
     res.cookies.set(AUTH_COOKIE_NAME, token, {
       httpOnly: true,
       sameSite: "lax",
@@ -42,7 +67,8 @@ export async function POST(req: Request) {
     });
 
     return res;
-  } catch (e) {
+  } catch (e: any) {
+    console.error("LOGIN_ERROR:", e?.message || e);
     return NextResponse.json({ error: "Erro no login" }, { status: 500 });
   }
 }
