@@ -115,24 +115,8 @@ export default function Page() {
           </button>
         </Link>
 
+        {/* Topo direita: exportar + sair */}
         <div style={{ display: "flex", gap: 10 }}>
-          <button
-            onClick={carregar}
-            style={{
-              padding: "10px 16px",
-              borderRadius: 12,
-              border: "1px solid #333",
-              background: "transparent",
-              color: "white",
-              fontWeight: 800,
-              cursor: "pointer",
-              opacity: loading ? 0.7 : 1,
-            }}
-          >
-            {loading ? "CARREGANDO..." : "GERAR"}
-          </button>
-
-          {/* ✅ NOVO: EXPORTAR CSV DO MÊS/ANO SELECIONADOS */}
           <button
             onClick={() =>
               window.open(
@@ -171,41 +155,84 @@ export default function Page() {
           RELATÓRIO MENSAL
         </h1>
 
-        {/* Filtros */}
-        <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
-          <select
-            value={mes}
-            onChange={(e) => setMes(Number(e.target.value))}
+        {/* Filtros (GERAR ao lado do Ano) */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 140px 160px",
+            gap: 10,
+            marginBottom: 20,
+            alignItems: "end",
+          }}
+        >
+          {/* Mês */}
+          <div>
+            <label
+              style={{ display: "block", marginBottom: 8, fontWeight: 800 }}
+            >
+              Mês
+            </label>
+            <select
+              value={mes}
+              onChange={(e) => setMes(Number(e.target.value))}
+              style={{
+                width: "100%",
+                padding: "10px 12px",
+                borderRadius: 12,
+                border: "1px solid #333",
+                background: "transparent",
+                color: "white",
+                fontWeight: 800,
+              }}
+            >
+              {meses.map((m) => (
+                <option key={m.v} value={m.v} style={{ color: "black" }}>
+                  {m.n}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Ano */}
+          <div>
+            <label
+              style={{ display: "block", marginBottom: 8, fontWeight: 800 }}
+            >
+              Ano
+            </label>
+            <input
+              type="number"
+              value={ano}
+              onChange={(e) => setAno(Number(e.target.value))}
+              style={{
+                width: "100%",
+                padding: "10px 12px",
+                borderRadius: 12,
+                border: "1px solid #333",
+                background: "transparent",
+                color: "white",
+                fontWeight: 800,
+              }}
+            />
+          </div>
+
+          {/* GERAR */}
+          <button
+            onClick={carregar}
             style={{
-              padding: "10px 12px",
+              padding: "10px 16px",
               borderRadius: 12,
               border: "1px solid #333",
               background: "transparent",
               color: "white",
-              fontWeight: 800,
+              fontWeight: 900,
+              cursor: "pointer",
+              opacity: loading ? 0.7 : 1,
+              height: 44,
             }}
           >
-            {meses.map((m) => (
-              <option key={m.v} value={m.v} style={{ color: "black" }}>
-                {m.n}
-              </option>
-            ))}
-          </select>
-
-          <input
-            type="number"
-            value={ano}
-            onChange={(e) => setAno(Number(e.target.value))}
-            style={{
-              padding: "10px 12px",
-              borderRadius: 12,
-              border: "1px solid #333",
-              background: "transparent",
-              color: "white",
-              fontWeight: 800,
-              width: 120,
-            }}
-          />
+            {loading ? "CARREGANDO..." : "GERAR"}
+          </button>
         </div>
 
         {error && (
@@ -225,6 +252,7 @@ export default function Page() {
 
         {data && (
           <>
+            {/* Cards */}
             <div
               style={{
                 display: "grid",
@@ -246,7 +274,9 @@ export default function Page() {
               <Card
                 titulo="Cancelados"
                 qtd={data.porStatus.CANCELADO.qtd}
-                valor={formatBRLFromCents(data.porStatus.CANCELADO.valorCentavos)}
+                valor={formatBRLFromCents(
+                  data.porStatus.CANCELADO.valorCentavos
+                )}
               />
               <Card
                 titulo="Total"
@@ -255,6 +285,7 @@ export default function Page() {
               />
             </div>
 
+            {/* Tabela */}
             <div
               style={{
                 border: "1px solid #222",
