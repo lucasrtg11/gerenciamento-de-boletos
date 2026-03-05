@@ -10,9 +10,9 @@ export type BoletoDTO = {
   clienteNome?: string | null;
   pagadorNome?: string | null;
   valorCentavos: number;
-  dataVencimento: string; // ISO
-  criadoEm?: string; // ISO
-  atualizadoEm?: string; // ISO
+  dataVencimento: string;
+  criadoEm?: string;
+  atualizadoEm?: string;
   status: Status;
 };
 
@@ -23,11 +23,15 @@ export default async function Page() {
     orderBy: { criadoEm: "desc" },
   });
 
-  const boletos: BoletoDTO[] = boletosDB.map((b: any) => ({
-    ...b,
-    dataVencimento: b.dataVencimento?.toISOString?.() ?? String(b.dataVencimento),
-    criadoEm: b.criadoEm?.toISOString?.() ?? b.criadoEm,
-    atualizadoEm: b.atualizadoEm?.toISOString?.() ?? b.atualizadoEm,
+  const boletos: BoletoDTO[] = boletosDB.map((b) => ({
+    id: b.id,
+    clienteNome: b.clienteNome,
+    pagadorNome: b.pagadorNome,
+    valorCentavos: b.valorCentavos,
+    status: b.status as Status,
+    dataVencimento: b.dataVencimento.toISOString(),
+    criadoEm: b.criadoEm?.toISOString(),
+    atualizadoEm: b.atualizadoEm?.toISOString(),
   }));
 
   return (
@@ -75,6 +79,7 @@ export default async function Page() {
               RELATÓRIO MENSAL
             </button>
           </Link>
+
           <LogoutButton />
         </div>
       </div>
