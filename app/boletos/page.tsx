@@ -25,7 +25,8 @@ export default async function Page() {
 
   const boletos: BoletoDTO[] = boletosDB.map((b: any) => ({
     ...b,
-    dataVencimento: b.dataVencimento?.toISOString?.() ?? String(b.dataVencimento),
+    dataVencimento:
+      b.dataVencimento?.toISOString?.() ?? String(b.dataVencimento),
     criadoEm: b.criadoEm?.toISOString?.() ?? b.criadoEm,
     atualizadoEm: b.atualizadoEm?.toISOString?.() ?? b.atualizadoEm,
   }));
@@ -75,6 +76,22 @@ export default async function Page() {
               RELATÓRIO MENSAL
             </button>
           </Link>
+
+          <a href="/api/relatorios/exportar">
+            <button
+              style={{
+                padding: "10px 16px",
+                borderRadius: 12,
+                border: "1px solid #333",
+                background: "transparent",
+                color: "white",
+                fontWeight: 800,
+                cursor: "pointer",
+              }}
+            >
+              EXPORTAR RELATÓRIO
+            </button>
+          </a>
 
           <LogoutButton />
         </div>
