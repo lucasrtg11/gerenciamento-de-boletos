@@ -75,24 +75,6 @@ export default async function Page() {
               RELATÓRIO MENSAL
             </button>
           </Link>
-
-          {/* ✅ abre a tela com filtros */}
-          <Link href="/relatorios/exportar">
-            <button
-              style={{
-                padding: "10px 16px",
-                borderRadius: 12,
-                border: "1px solid #333",
-                background: "transparent",
-                color: "white",
-                fontWeight: 800,
-                cursor: "pointer",
-              }}
-            >
-              EXPORTAR RELATÓRIO
-            </button>
-          </Link>
-
           <LogoutButton />
         </div>
       </div>
