@@ -132,6 +132,28 @@ export default function Page() {
             {loading ? "CARREGANDO..." : "GERAR"}
           </button>
 
+          {/* ✅ NOVO: EXPORTAR CSV DO MÊS/ANO SELECIONADOS */}
+          <button
+            onClick={() =>
+              window.open(
+                `/api/relatorios/mensal/exportar?ano=${ano}&mes=${mes}`,
+                "_blank"
+              )
+            }
+            style={{
+              padding: "10px 16px",
+              borderRadius: 12,
+              border: "1px solid #333",
+              background: "transparent",
+              color: "white",
+              fontWeight: 800,
+              cursor: "pointer",
+              opacity: loading ? 0.7 : 1,
+            }}
+          >
+            EXPORTAR CSV
+          </button>
+
           <LogoutButton />
         </div>
       </div>
@@ -151,7 +173,6 @@ export default function Page() {
 
         {/* Filtros */}
         <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
-          {/* ✅ Mês por nome */}
           <select
             value={mes}
             onChange={(e) => setMes(Number(e.target.value))}
@@ -204,7 +225,6 @@ export default function Page() {
 
         {data && (
           <>
-            {/* Cards */}
             <div
               style={{
                 display: "grid",
@@ -235,7 +255,6 @@ export default function Page() {
               />
             </div>
 
-            {/* Tabela */}
             <div
               style={{
                 border: "1px solid #222",
