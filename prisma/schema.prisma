@@ -9,7 +9,7 @@ datasource db {
 
 model Boleto {
   id               String        @id @default(cuid())
-  numeroBoleto     Int?          @unique
+  numeroBoleto     String?          @unique
   clienteNome      String
   pagadorNome      String?
   seuNumero        String?

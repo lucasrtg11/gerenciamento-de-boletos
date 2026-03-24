@@ -20,13 +20,19 @@ export async function POST(req: Request) {
   try {
     const body = await req.json().catch(() => ({}));
 
+    const numeroBoleto = String(body.numeroBoleto ?? "").trim();
     const pagadorNomeRaw = body.pagadorNome ?? body.clienteNome;
     const pagadorNome = String(pagadorNomeRaw ?? "").trim();
 
     const valorCentavos = Number(body.valorCentavos);
     const dataVencimentoRaw = body.dataVencimento;
 
-    if (!pagadorNome || !Number.isFinite(valorCentavos) || !dataVencimentoRaw) {
+    if (
+      !numeroBoleto ||
+      !pagadorNome ||
+      !Number.isFinite(valorCentavos) ||
+      !dataVencimentoRaw
+    ) {
       return NextResponse.json(
         { error: "Dados inválidos" },
         { status: 400 }
@@ -41,25 +47,21 @@ export async function POST(req: Request) {
       );
     }
 
-    const ultimoBoleto = await prisma.boleto.findFirst({
-      where: {
-        numeroBoleto: {
-          not: null,
-        },
-      },
-      orderBy: {
-        numeroBoleto: "desc",
-      },
-      select: {
-        numeroBoleto: true,
-      },
+    const existeNumero = await prisma.boleto.findFirst({
+      where: { numeroBoleto },
+      select: { id: true },
     });
 
-    const proximoNumero = (ultimoBoleto?.numeroBoleto ?? 0) + 1;
+    if (existeNumero) {
+      return NextResponse.json(
+        { error: "Já existe um boleto com esse número." },
+        { status: 400 }
+      );
+    }
 
     const novo = await prisma.boleto.create({
       data: {
-        numeroBoleto: proximoNumero,
+        numeroBoleto,
         clienteNome: pagadorNome,
         pagadorNome,
         valorCentavos,
