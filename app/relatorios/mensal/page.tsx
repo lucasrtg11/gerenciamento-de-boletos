@@ -15,7 +15,7 @@ type Status = "ABERTO" | "PAGO" | "CANCELADO";
 
 type ItemBoleto = {
   id: string;
-  numeroBoleto?: number | null;
+  numeroBoleto?: string | null;
   pagadorNome?: string | null;
   valorCentavos: number;
   status: Status;

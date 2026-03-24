@@ -8,12 +8,12 @@ type Status = "ABERTO" | "PAGO" | "CANCELADO";
 
 export type BoletoDTO = {
   id: string;
-  numeroBoleto?: number | null;
+  numeroBoleto?: string | null;
   clienteNome?: string | null;
   pagadorNome?: string | null;
   valorCentavos: number;
-  dataVencimento: string; // ISO string
-  criadoEm?: string; // ISO string (emissão)
+  dataVencimento: string;
+  criadoEm?: string;
   status: Status;
 };
 
