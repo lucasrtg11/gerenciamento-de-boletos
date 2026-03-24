@@ -41,8 +41,25 @@ export async function POST(req: Request) {
       );
     }
 
+    const ultimoBoleto = await prisma.boleto.findFirst({
+      where: {
+        numeroBoleto: {
+          not: null,
+        },
+      },
+      orderBy: {
+        numeroBoleto: "desc",
+      },
+      select: {
+        numeroBoleto: true,
+      },
+    });
+
+    const proximoNumero = (ultimoBoleto?.numeroBoleto ?? 0) + 1;
+
     const novo = await prisma.boleto.create({
       data: {
+        numeroBoleto: proximoNumero,
         clienteNome: pagadorNome,
         pagadorNome,
         valorCentavos,

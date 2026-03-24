@@ -28,7 +28,6 @@ export async function GET(req: Request) {
     const inicio = startOfMonthUTC(ano, mes);
     const fim = startOfNextMonthUTC(ano, mes);
 
-    // Agrupa por status no mês (usando criadoEm como "mês de emissão")
     const agrupado = await prisma.boleto.groupBy({
       by: ["status"],
       where: {
@@ -38,12 +37,12 @@ export async function GET(req: Request) {
       _sum: { valorCentavos: true },
     });
 
-    // Lista dos boletos do mês (para tabela)
     const itens = await prisma.boleto.findMany({
       where: { criadoEm: { gte: inicio, lt: fim } },
       orderBy: { criadoEm: "desc" },
       select: {
         id: true,
+        numeroBoleto: true,
         pagadorNome: true,
         valorCentavos: true,
         status: true,
@@ -52,7 +51,6 @@ export async function GET(req: Request) {
       },
     });
 
-    // garante retorno consistente
     const porStatus = {
       ABERTO: { qtd: 0, valorCentavos: 0 },
       PAGO: { qtd: 0, valorCentavos: 0 },
@@ -87,6 +85,9 @@ export async function GET(req: Request) {
       })),
     });
   } catch {
-    return NextResponse.json({ error: "Erro ao gerar relatório mensal" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Erro ao gerar relatório mensal" },
+      { status: 500 }
+    );
   }
 }

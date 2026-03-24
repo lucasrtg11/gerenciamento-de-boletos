@@ -7,6 +7,7 @@ type Status = "ABERTO" | "PAGO" | "CANCELADO";
 
 export type BoletoDTO = {
   id: string;
+  numeroBoleto?: number | null;
   clienteNome?: string | null;
   pagadorNome?: string | null;
   valorCentavos: number;
@@ -20,11 +21,15 @@ export const dynamic = "force-dynamic";
 
 export default async function Page() {
   const boletosDB = await prisma.boleto.findMany({
-    orderBy: { criadoEm: "desc" },
+    orderBy: [
+      { criadoEm: "desc" },
+      { id: "desc" },
+    ],
   });
 
   const boletos: BoletoDTO[] = boletosDB.map((b) => ({
     id: b.id,
+    numeroBoleto: b.numeroBoleto,
     clienteNome: b.clienteNome,
     pagadorNome: b.pagadorNome,
     valorCentavos: b.valorCentavos,

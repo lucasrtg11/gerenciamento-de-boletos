@@ -15,11 +15,12 @@ type Status = "ABERTO" | "PAGO" | "CANCELADO";
 
 type ItemBoleto = {
   id: string;
+  numeroBoleto?: number | null;
   pagadorNome?: string | null;
   valorCentavos: number;
   status: Status;
-  dataVencimento: string; // ISO
-  criadoEm: string; // ISO
+  dataVencimento: string;
+  criadoEm: string;
 };
 
 type RelatorioMensalResponse = {
@@ -296,6 +297,7 @@ export default function Page() {
               <table style={{ width: "100%", borderCollapse: "collapse" }}>
                 <thead>
                   <tr>
+                    <th style={th}>N° Boleto</th>
                     <th style={th}>Pagador</th>
                     <th style={th}>Status</th>
                     <th style={th}>Valor</th>
@@ -306,6 +308,7 @@ export default function Page() {
                 <tbody>
                   {data.itens.map((b) => (
                     <tr key={b.id}>
+                      <td style={td}>{b.numeroBoleto ?? "-"}</td>
                       <td style={td}>{b.pagadorNome || "-"}</td>
                       <td style={td}>{b.status}</td>
                       <td style={td}>{formatBRLFromCents(b.valorCentavos)}</td>
@@ -320,7 +323,7 @@ export default function Page() {
 
                   {data.itens.length === 0 && (
                     <tr>
-                      <td style={{ padding: 12 }} colSpan={5}>
+                      <td style={{ padding: 12 }} colSpan={6}>
                         Nenhum boleto neste mês.
                       </td>
                     </tr>
