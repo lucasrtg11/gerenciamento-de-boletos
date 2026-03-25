@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 type Status = "ABERTO" | "PAGO" | "CANCELADO";
 
@@ -28,7 +29,25 @@ export default function BoletoActions({
   }
 
   return (
-    <div style={{ display: "flex", gap: 8 }}>
+    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+      
+      {/* BOTÃO EDITAR */}
+      <Link
+        href={`/boletos/${id}/editar`}
+        style={{
+          padding: "6px 10px",
+          borderRadius: 8,
+          border: "1px solid #333",
+          background: "white",
+          color: "#333",
+          fontWeight: 700,
+          cursor: "pointer",
+          textDecoration: "none",
+        }}
+      >
+        ✏ Editar
+      </Link>
+
       {status !== "PAGO" && (
         <button
           onClick={() => atualizarStatus("PAGO")}
