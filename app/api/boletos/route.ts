@@ -47,7 +47,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const existeNumero = await prisma.boleto.findFirst({
+    const existeNumero = await prisma.boleto.findUnique({
       where: { numeroBoleto },
       select: { id: true },
     });
