@@ -5,6 +5,8 @@ type RouteContext = {
   params: Promise<{ id: string }>;
 };
 
+type StatusBoleto = "ABERTO" | "PAGO" | "CANCELADO";
+
 export async function PATCH(req: Request, context: RouteContext) {
   try {
     const { id } = await context.params;
@@ -12,7 +14,6 @@ export async function PATCH(req: Request, context: RouteContext) {
 
     const boletoExistente = await prisma.boleto.findUnique({
       where: { id },
-      select: { id: true, numeroBoleto: true },
     });
 
     if (!boletoExistente) {
@@ -20,6 +21,24 @@ export async function PATCH(req: Request, context: RouteContext) {
         { error: "Boleto não encontrado." },
         { status: 404 }
       );
+    }
+
+    if (typeof body.status !== "undefined") {
+      const status = String(body.status).trim() as StatusBoleto;
+
+      if (!["ABERTO", "PAGO", "CANCELADO"].includes(status)) {
+        return NextResponse.json(
+          { error: "Status inválido." },
+          { status: 400 }
+        );
+      }
+
+      const atualizado = await prisma.boleto.update({
+        where: { id },
+        data: { status },
+      });
+
+      return NextResponse.json(atualizado, { status: 200 });
     }
 
     const numeroBoleto = String(body.numeroBoleto ?? "").trim();
@@ -102,12 +121,12 @@ export async function PATCH(req: Request, context: RouteContext) {
       },
     });
 
-    return NextResponse.json(atualizado);
+    return NextResponse.json(atualizado, { status: 200 });
   } catch (error) {
-    console.error("Erro ao editar boleto:", error);
+    console.error("Erro ao atualizar boleto:", error);
 
     return NextResponse.json(
-      { error: "Erro ao editar boleto." },
+      { error: "Erro ao atualizar boleto." },
       { status: 500 }
     );
   }

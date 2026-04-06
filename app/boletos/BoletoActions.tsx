@@ -16,22 +16,27 @@ export default function BoletoActions({
 
   async function atualizarStatus(novoStatus: Status) {
     try {
-      await fetch(`/api/boletos/${id}`, {
+      const res = await fetch(`/api/boletos/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: novoStatus }),
       });
 
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok) {
+        alert(data?.error || "Erro ao atualizar boleto");
+        return;
+      }
+
       router.refresh();
-    } catch (e) {
+    } catch {
       alert("Erro ao atualizar boleto");
     }
   }
 
   return (
     <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-      
-      {/* BOTÃO EDITAR */}
       <Link
         href={`/boletos/${id}/editar`}
         style={{
@@ -45,44 +50,44 @@ export default function BoletoActions({
           textDecoration: "none",
         }}
       >
-        ✏ Editar
+        🖉 Editar
       </Link>
 
-      {status !== "PAGO" && (
-        <button
-          onClick={() => atualizarStatus("PAGO")}
-          style={{
-            padding: "6px 10px",
-            borderRadius: 8,
-            border: "1px solid #1f7a3a",
-            background: "#28a745",
-            color: "white",
-            fontWeight: 700,
-            cursor: "pointer",
-          }}
-        >
-          ✔ Pago
-        </button>
+      {status === "ABERTO" && (
+        <>
+          <button
+            onClick={() => atualizarStatus("PAGO")}
+            style={{
+              padding: "6px 10px",
+              borderRadius: 8,
+              border: "1px solid #1f7a3a",
+              background: "#28a745",
+              color: "white",
+              fontWeight: 700,
+              cursor: "pointer",
+            }}
+          >
+            ✔ Pago
+          </button>
+
+          <button
+            onClick={() => atualizarStatus("CANCELADO")}
+            style={{
+              padding: "6px 10px",
+              borderRadius: 8,
+              border: "1px solid #7a1f1f",
+              background: "#dc3545",
+              color: "white",
+              fontWeight: 700,
+              cursor: "pointer",
+            }}
+          >
+            ✖ Cancelar
+          </button>
+        </>
       )}
 
-      {status !== "CANCELADO" && (
-        <button
-          onClick={() => atualizarStatus("CANCELADO")}
-          style={{
-            padding: "6px 10px",
-            borderRadius: 8,
-            border: "1px solid #7a1f1f",
-            background: "#dc3545",
-            color: "white",
-            fontWeight: 700,
-            cursor: "pointer",
-          }}
-        >
-          ✖ Cancelar
-        </button>
-      )}
-
-      {status === "CANCELADO" && (
+      {(status === "PAGO" || status === "CANCELADO") && (
         <button
           onClick={() => atualizarStatus("ABERTO")}
           style={{
