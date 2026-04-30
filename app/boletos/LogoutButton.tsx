@@ -14,7 +14,6 @@ export default function LogoutButton() {
       router.push("/login");
       router.refresh();
     } catch {
-      // se der erro, joga pro login do mesmo jeito
       router.push("/login");
       router.refresh();
     } finally {
@@ -28,24 +27,26 @@ export default function LogoutButton() {
       disabled={loading}
       style={{
         padding: "10px 14px",
-        borderRadius: 12,
-        border: "1px solid #333",
-        background: loading ? "#111" : "transparent",
-        color: "white",
-        fontWeight: 900,
-        letterSpacing: 0.6,
+        borderRadius: 10,
+        border: "1px solid rgba(239,68,68,0.3)",
+        background: loading
+          ? "rgba(239,68,68,0.08)"
+          : "rgba(239,68,68,0.12)",
+        color: "#ef4444",
+        fontWeight: 800,
+        letterSpacing: 0.5,
         cursor: loading ? "not-allowed" : "pointer",
-        transition: "all 120ms ease",
+        transition: "all 0.2s ease",
       }}
       onMouseEnter={(e) => {
         if (!loading) {
-          e.currentTarget.style.background = "white";
-          e.currentTarget.style.color = "black";
+          e.currentTarget.style.background = "rgba(239,68,68,0.2)";
         }
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.background = loading ? "#111" : "transparent";
-        e.currentTarget.style.color = "white";
+        e.currentTarget.style.background = loading
+          ? "rgba(239,68,68,0.08)"
+          : "rgba(239,68,68,0.12)";
       }}
     >
       {loading ? "SAINDO..." : "SAIR"}

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import BoletosTable from "./BoletosTable";
 import LogoutButton from "./LogoutButton";
+import ThemeToggle from "../components/ThemeToggle"; // 👈 ADD
 import { prisma } from "@/app/lib/prisma";
 
 type Status = "ABERTO" | "PAGO" | "CANCELADO";
@@ -21,10 +22,7 @@ export const dynamic = "force-dynamic";
 
 export default async function Page() {
   const boletosDB = await prisma.boleto.findMany({
-    orderBy: [
-      { criadoEm: "desc" },
-      { id: "desc" },
-    ],
+    orderBy: [{ criadoEm: "desc" }, { id: "desc" }],
   });
 
   const boletos: BoletoDTO[] = boletosDB.map((b) => ({
@@ -40,57 +38,82 @@ export default async function Page() {
   }));
 
   return (
-    <main style={{ padding: 24 }}>
-      {/* Topo */}
-      <div
-        style={{
-          maxWidth: 1400,
-          margin: "0 auto",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 10,
-        }}
-      >
-        <Link href="/boletos/novo">
-          <button
-            style={{
-              padding: "10px 16px",
-              borderRadius: 12,
-              border: "1px solid #333",
-              background: "transparent",
-              color: "white",
-              fontWeight: 800,
-              cursor: "pointer",
-            }}
-          >
-            ← VOLTAR
-          </button>
-        </Link>
+    <main
+      style={{
+        minHeight: "100vh",
+        padding: 24,
+        background: "var(--bg)",
+        color: "var(--text)",
+      }}
+    >
+      <div style={{ maxWidth: 1400, margin: "0 auto" }}>
+        
+        {/* Header */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 20,
+            flexWrap: "wrap",
+            gap: 10,
+          }}
+        >
+          <h1 style={{ fontSize: 22, fontWeight: 800 }}>
+            📄 Boletos
+          </h1>
 
-        <div style={{ display: "flex", gap: 10 }}>
-          <Link href="/relatorios/mensal">
-            <button
-              style={{
-                padding: "10px 16px",
-                borderRadius: 12,
-                border: "1px solid #333",
-                background: "transparent",
-                color: "white",
-                fontWeight: 800,
-                cursor: "pointer",
-              }}
-            >
-              RELATÓRIO MENSAL
-            </button>
-          </Link>
+          <div style={{ display: "flex", gap: 10 }}>
+            <ThemeToggle /> {/* 👈 ADD AQUI */}
 
-          <LogoutButton />
+            <Link href="/boletos/novo">
+              <button
+                style={{
+                  padding: "10px 16px",
+                  borderRadius: 10,
+                  border: "1px solid var(--border)",
+                  background: "var(--card)",
+                  color: "var(--text)",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                }}
+              >
+                + Novo boleto
+              </button>
+            </Link>
+
+            <Link href="/relatorios/mensal">
+              <button
+                style={{
+                  padding: "10px 16px",
+                  borderRadius: 10,
+                  border: "1px solid var(--border)",
+                  background: "var(--card)",
+                  color: "var(--text)",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                }}
+              >
+                Relatório
+              </button>
+            </Link>
+
+            <LogoutButton />
+          </div>
+        </div>
+
+        {/* Tabela */}
+        <div
+          style={{
+            background: "var(--card)",
+            border: "1px solid var(--border)",
+            borderRadius: 12,
+            padding: 16,
+          }}
+        >
+          <BoletosTable boletos={boletos} />
         </div>
       </div>
-
-      {/* Tabela */}
-      <BoletosTable boletos={boletos} />
     </main>
   );
 }

@@ -14,7 +14,6 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <head>
-        {/* Impede tradução automática do Google */}
         <meta name="google" content="notranslate" />
       </head>
       <body>{children}</body>
