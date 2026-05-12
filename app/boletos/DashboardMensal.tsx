@@ -9,6 +9,7 @@ type BoletoDTO = {
   valorCentavos: number;
   status: Status;
   dataVencimento: string;
+  criadoEm?: string;
 };
 
 function formatMoneyBRLFromCents(cents: number) {
@@ -31,15 +32,11 @@ function isAtrasado(b: BoletoDTO) {
   return venc < hoje;
 }
 
-export default function DashboardMensal({
-  boletos,
-}: {
-  boletos: BoletoDTO[];
-}) {
+export default function DashboardMensal({ boletos }: { boletos: BoletoDTO[] }) {
   const resumo = useMemo(() => {
     const agora = new Date();
-    const mes = agora.getMonth();
-    const ano = agora.getFullYear();
+    const mesAtual = agora.getMonth();
+    const anoAtual = agora.getFullYear();
 
     let somaAbertos = 0;
     let somaAtrasados = 0;
@@ -50,9 +47,14 @@ export default function DashboardMensal({
     let qtdPagos = 0;
 
     for (const b of boletos) {
-      const data = new Date(b.dataVencimento);
+      // Usa criadoEm para saber se o boleto pertence ao mês atual.
+      // Se não existir, usa dataVencimento como fallback.
+      const dataBase = new Date(b.criadoEm || b.dataVencimento);
 
-      if (data.getMonth() !== mes || data.getFullYear() !== ano) {
+      if (
+        dataBase.getMonth() !== mesAtual ||
+        dataBase.getFullYear() !== anoAtual
+      ) {
         continue;
       }
 
@@ -83,8 +85,7 @@ export default function DashboardMensal({
       somaAbertos,
       somaAtrasados,
       somaPagos,
-      total:
-        somaAbertos + somaAtrasados + somaPagos,
+      total: somaAbertos + somaAtrasados + somaPagos,
     };
   }, [boletos]);
 
@@ -125,13 +126,7 @@ export default function DashboardMensal({
   );
 }
 
-function Card({
-  title,
-  subtitle,
-  value,
-  danger,
-  success,
-}: any) {
+function Card({ title, subtitle, value, danger, success }: any) {
   const border = danger
     ? "1px solid rgba(255, 80, 80, 0.25)"
     : success

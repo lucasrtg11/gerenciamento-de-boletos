@@ -2,7 +2,7 @@ import NovoBoletoForm from "../NovoBoletoForm";
 import DashboardResumo from "../DashboardResumo";
 import DashboardMensal from "../DashboardMensal";
 import LogoutButton from "../LogoutButton";
-import ThemeToggle from "@/app/components/ThemeToggle"; // ✅ CORRETO
+import ThemeToggle from "@/app/components/ThemeToggle";
 import Link from "next/link";
 import { prisma } from "@/app/lib/prisma";
 
@@ -13,6 +13,7 @@ type BoletoDTO = {
   valorCentavos: number;
   status: Status;
   dataVencimento: string;
+  criadoEm?: string;
 };
 
 export const dynamic = "force-dynamic";
@@ -24,6 +25,7 @@ export default async function Page() {
       valorCentavos: true,
       status: true,
       dataVencimento: true,
+      criadoEm: true, // 👈 ADD
     },
     orderBy: { criadoEm: "desc" },
   });
@@ -34,6 +36,9 @@ export default async function Page() {
     status: b.status as Status,
     dataVencimento:
       (b.dataVencimento as any)?.toISOString?.() ?? String(b.dataVencimento),
+
+    criadoEm:
+      (b.criadoEm as any)?.toISOString?.() ?? String(b.criadoEm), // 👈 ADD
   }));
 
   return (
@@ -61,7 +66,7 @@ export default async function Page() {
         <div />
 
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <ThemeToggle /> {/* ✅ botão funcionando */}
+          <ThemeToggle />
 
           <Link href="/boletos" style={{ textDecoration: "none" }}>
             <span style={btn}>

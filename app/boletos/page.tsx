@@ -1,7 +1,7 @@
 import Link from "next/link";
 import BoletosTable from "./BoletosTable";
 import LogoutButton from "./LogoutButton";
-import ThemeToggle from "../components/ThemeToggle"; // 👈 ADD
+import ThemeToggle from "../components/ThemeToggle";
 import { prisma } from "@/app/lib/prisma";
 
 type Status = "ABERTO" | "PAGO" | "CANCELADO";
@@ -64,7 +64,7 @@ export default async function Page() {
           </h1>
 
           <div style={{ display: "flex", gap: 10 }}>
-            <ThemeToggle /> {/* 👈 ADD AQUI */}
+            <ThemeToggle />
 
             <Link href="/boletos/novo">
               <button
