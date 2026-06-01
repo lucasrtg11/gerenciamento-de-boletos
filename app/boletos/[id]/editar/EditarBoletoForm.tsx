@@ -16,7 +16,12 @@ type Props = {
 
 export default function EditarBoletoForm({ boleto }: Props) {
   const router = useRouter();
-  const [form, setForm] = useState(boleto);
+
+  const [form, setForm] = useState({
+    ...boleto,
+    valorCentavos: boleto.valorCentavos / 100,
+  });
+
   const [loading, setLoading] = useState(false);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -24,7 +29,10 @@ export default function EditarBoletoForm({ boleto }: Props) {
 
     setForm((prev) => ({
       ...prev,
-      [name]: name === "valorCentavos" ? Number(value) : value,
+      [name]:
+        name === "valorCentavos"
+          ? parseFloat(value || "0")
+          : value,
     }));
   }
 
@@ -35,7 +43,12 @@ export default function EditarBoletoForm({ boleto }: Props) {
     const res = await fetch(`/api/boletos/${form.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      body: JSON.stringify({
+        ...form,
+        valorCentavos: Math.round(
+          Number(form.valorCentavos) * 100
+        ),
+      }),
     });
 
     if (!res.ok) {
@@ -51,7 +64,10 @@ export default function EditarBoletoForm({ boleto }: Props) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4 rounded-xl bg-white p-6 shadow">
       <div>
-        <label className="mb-1 block font-semibold text-black">Número do boleto</label>
+        <label className="mb-1 block font-semibold text-black">
+          Número do boleto
+        </label>
+
         <input
           name="numeroBoleto"
           value={form.numeroBoleto}
@@ -61,7 +77,10 @@ export default function EditarBoletoForm({ boleto }: Props) {
       </div>
 
       <div>
-        <label className="mb-1 block font-semibold text-black">Cliente</label>
+        <label className="mb-1 block font-semibold text-black">
+          Cliente
+        </label>
+
         <input
           name="clienteNome"
           value={form.clienteNome}
@@ -71,7 +90,10 @@ export default function EditarBoletoForm({ boleto }: Props) {
       </div>
 
       <div>
-        <label className="mb-1 block font-semibold text-black">Pagador</label>
+        <label className="mb-1 block font-semibold text-black">
+          Pagador
+        </label>
+
         <input
           name="pagadorNome"
           value={form.pagadorNome}
@@ -81,9 +103,13 @@ export default function EditarBoletoForm({ boleto }: Props) {
       </div>
 
       <div>
-        <label className="mb-1 block font-semibold text-black">Valor em centavos</label>
+        <label className="mb-1 block font-semibold text-black">
+          Valor (R$)
+        </label>
+
         <input
           type="number"
+          step="0.01"
           name="valorCentavos"
           value={form.valorCentavos}
           onChange={handleChange}
@@ -92,7 +118,10 @@ export default function EditarBoletoForm({ boleto }: Props) {
       </div>
 
       <div>
-        <label className="mb-1 block font-semibold text-black">Data de vencimento</label>
+        <label className="mb-1 block font-semibold text-black">
+          Data de vencimento
+        </label>
+
         <input
           type="date"
           name="dataVencimento"

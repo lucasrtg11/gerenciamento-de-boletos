@@ -38,7 +38,7 @@ export default async function Page() {
       (b.dataVencimento as any)?.toISOString?.() ?? String(b.dataVencimento),
 
     criadoEm:
-      (b.criadoEm as any)?.toISOString?.() ?? String(b.criadoEm), // 👈 ADD
+      (b.criadoEm as any)?.toISOString?.() ?? String(b.criadoEm),
   }));
 
   return (
